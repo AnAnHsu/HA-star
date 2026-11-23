@@ -58,14 +58,6 @@
     --sat:max(env(safe-area-inset-top,0px),var(--ha-inset-top,24px));
     --sab:max(env(safe-area-inset-bottom,0px),var(--ha-inset-bottom,0px));
   }
-  /* 小屏兜底：窄屏上第三页右列是按图标位置算出来的，容易算宽、顶到屏幕外。
-     这里给个上限，算错也不会出界；屏幕宽的机器不受影响。 */
-  @media (max-width:420px){
-    #grid3 .pg3side{max-width:46%;}
-    #grid3 .pg3side .sdCard{padding-top:16px;}
-    #grid3 .sdAv{width:36px;height:36px;}
-    #grid3 .pg3chat{overflow:hidden;}
-  }
   #phone{
     --sat:max(env(safe-area-inset-top,0px),var(--ha-inset-top,24px));
     --sab:max(env(safe-area-inset-bottom,0px),var(--ha-inset-bottom,0px));
@@ -4668,7 +4660,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.5</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.6</div>
     </div>
   </section>
 
@@ -10199,13 +10191,8 @@
     }
     if(!(w>=70 && w<=200)){ wantL=-1; w=Math.round(cw*0.42); }
     s.style.right='auto'; s.style.bottom='auto';
-    // 兜底：不管图标排几列、屏幕多窄，右列都不许超出这一页的右边界
-    var gw=Math.round(g.getBoundingClientRect().width) || g.clientWidth;
-    if(w>gw*0.5) w=Math.round(gw*0.5);
-    var sl=(wantL>=0 ? wantL : Math.round(cl+cw-w));
-    if(sl+w>gw-4) sl=Math.max(4, gw-4-w);
     s.style.width=w+'px';
-    s.style.left=sl+'px';
+    s.style.left=(wantL>=0 ? wantL : Math.round(cl+cw-w))+'px';
     s.style.top=Math.round(cr.top-gr.top)+'px';
     s.style.height=Math.round(cr.height)+'px';
     var cd=s.querySelector('.sdCard');
@@ -10213,7 +10200,7 @@
     var pEl=s.querySelector('.sdPhoto');
     var ch=Math.round(cr.height);
     if(pEl) pEl.style.height=Math.max(28, ch-w-7)+'px';
-    var relL=sl-cl;
+    var relL=(wantL>=0 ? wantL : Math.round(cl+cw-w))-cl;
     c.style.setProperty('--sdpd', Math.max(0, Math.round(cw-relL)+16)+'px');
   }
 
