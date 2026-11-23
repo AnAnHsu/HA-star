@@ -4668,7 +4668,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.4</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.5</div>
     </div>
   </section>
 
@@ -10199,8 +10199,13 @@
     }
     if(!(w>=70 && w<=200)){ wantL=-1; w=Math.round(cw*0.42); }
     s.style.right='auto'; s.style.bottom='auto';
+    // 兜底：不管图标排几列、屏幕多窄，右列都不许超出这一页的右边界
+    var gw=Math.round(g.getBoundingClientRect().width) || g.clientWidth;
+    if(w>gw*0.5) w=Math.round(gw*0.5);
+    var sl=(wantL>=0 ? wantL : Math.round(cl+cw-w));
+    if(sl+w>gw-4) sl=Math.max(4, gw-4-w);
     s.style.width=w+'px';
-    s.style.left=(wantL>=0 ? wantL : Math.round(cl+cw-w))+'px';
+    s.style.left=sl+'px';
     s.style.top=Math.round(cr.top-gr.top)+'px';
     s.style.height=Math.round(cr.height)+'px';
     var cd=s.querySelector('.sdCard');
@@ -10208,7 +10213,7 @@
     var pEl=s.querySelector('.sdPhoto');
     var ch=Math.round(cr.height);
     if(pEl) pEl.style.height=Math.max(28, ch-w-7)+'px';
-    var relL=(wantL>=0 ? wantL : Math.round(cl+cw-w))-cl;
+    var relL=sl-cl;
     c.style.setProperty('--sdpd', Math.max(0, Math.round(cw-relL)+16)+'px');
   }
 
