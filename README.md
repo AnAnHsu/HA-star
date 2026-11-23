@@ -15,6 +15,14 @@
 <p align="center">
   <img src="docs/themes.jpg" alt="咖啡小熊（星星）· 咖啡小熊（奶油）· 塔罗">
 </p>
+### 作者实测美化 · 紫色主题
+
+作者自己手机上跑起来的样子，从左到右是第一、二、三页。壁纸、图标、相册这些都能在「设置 → 主题」里换。
+
+<p align="center">
+  <img src="docs/shots-purple.jpg" alt="作者实拍的紫色主题桌面">
+</p>
+
 
 ## 它是什么
 
