@@ -1,0 +1,5 @@
+build/
+app/assets/
+tools/r8.jar
+*.jks
+*.keystore
