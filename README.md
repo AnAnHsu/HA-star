@@ -8,6 +8,16 @@
 
 一个单文件的网页，外面套一层很薄的 Android 壳，就成了现在这个样子：桌面、聊天、相册、日记、塔罗、电话、商城都在这一屏里。**数据全部存在你自己的手机上，不经过任何服务器。**
 
+## 长什么样
+
+两套内置主题，加上塔罗页那张星空底。这些图都打包在网页里，重装也还在。
+
+<p align="center">
+  <img src="docs/theme-star.jpg" width="230" alt="咖啡小熊（星星）">
+  <img src="docs/theme-cream.jpg" width="230" alt="咖啡小熊（奶油）">
+  <img src="docs/tarot.jpg" width="230" alt="塔罗">
+</p>
+
 ## 它是什么
 
 - `ha_star.html` —— 整个界面和逻辑都在这一个文件里，浏览器双击就能打开
