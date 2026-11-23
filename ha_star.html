@@ -58,6 +58,14 @@
     --sat:max(env(safe-area-inset-top,0px),var(--ha-inset-top,24px));
     --sab:max(env(safe-area-inset-bottom,0px),var(--ha-inset-bottom,0px));
   }
+  /* 小屏兜底：窄屏上第三页右列是按图标位置算出来的，容易算宽、顶到屏幕外。
+     这里给个上限，算错也不会出界；屏幕宽的机器不受影响。 */
+  @media (max-width:420px){
+    #grid3 .pg3side{max-width:46%;}
+    #grid3 .pg3side .sdCard{padding-top:16px;}
+    #grid3 .sdAv{width:36px;height:36px;}
+    #grid3 .pg3chat{overflow:hidden;}
+  }
   #phone{
     --sat:max(env(safe-area-inset-top,0px),var(--ha-inset-top,24px));
     --sab:max(env(safe-area-inset-bottom,0px),var(--ha-inset-bottom,0px));
@@ -4660,7 +4668,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.3</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.4</div>
     </div>
   </section>
 
