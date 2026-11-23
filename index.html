@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HA star · 网页版</title>
+<style>
+  html,body{height:100%;margin:0;background:#eaeffd;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;box-sizing:border-box;text-align:center}
+  h1{font-size:22px;color:#22242c;margin:0;letter-spacing:.5px}
+  p{font-size:13.5px;color:#6b7280;line-height:1.8;margin:0;max-width:320px}
+  a.go{display:inline-block;margin-top:8px;padding:13px 30px;border-radius:14px;color:#fff;text-decoration:none;
+    font-size:15px;font-weight:600;background:linear-gradient(135deg,#5b8cff,#7f6bff);
+    box-shadow:0 10px 24px rgba(90,120,255,.35)}
+  .tip{font-size:12px;color:#9aa1ae;margin-top:6px}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>HA star</h1>
+    <p>一台装在自己手机里的小手机。这是网页版，跟着窗口自适应，不会出现小屏错位。</p>
+    <a class="go" href="ha_star.html">进入小手机</a>
+    <div class="tip">第一次进要在「设置 → 模型接入」里填自己的 Key</div>
+  </div>
+  <script>setTimeout(function(){ location.replace('ha_star.html'); }, 900);</script>
+</body>
+</html>
