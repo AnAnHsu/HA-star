@@ -10,12 +10,10 @@
 
 ## 长什么样
 
-两套内置主题，加上塔罗页那张星空底。这些图都打包在网页里，重装也还在。
+两套内置主题，加上塔罗页那张星空底，从左到右依次是：咖啡小熊（星星）、咖啡小熊（奶油）、塔罗。这些图都打包在网页里，重装也还在。
 
 <p align="center">
-  <img src="docs/theme-star.jpg" width="230" alt="咖啡小熊（星星）">
-  <img src="docs/theme-cream.jpg" width="230" alt="咖啡小熊（奶油）">
-  <img src="docs/tarot.jpg" width="230" alt="塔罗">
+  <img src="docs/themes.jpg" alt="咖啡小熊（星星）· 咖啡小熊（奶油）· 塔罗">
 </p>
 
 ## 它是什么
