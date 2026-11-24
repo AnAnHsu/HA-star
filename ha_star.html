@@ -4667,7 +4667,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.10</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.11</div>
     </div>
   </section>
 
@@ -16978,6 +16978,29 @@
   if(!phone) return;
   var list=document.querySelectorAll('body > section.screen');
   for(var i=0;i<list.length;i++){ phone.appendChild(list[i]); }
+})();
+</script>
+<!-- 消息区跟着高度走：键盘弹起 / 屏幕缩短时，原本贴底的就仍然贴底，
+     不许把最后几条消息留在输入栏后面等用户手动上滑。 -->
+<script>
+(function(){
+  var box=document.getElementById('msgs');
+  if(!box) return;
+  var stick=true;
+  function nearBottom(){
+    return box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  }
+  function keep(){
+    if(stick){ box.scrollTop = box.scrollHeight; }
+  }
+  box.addEventListener('scroll', function(){ stick = nearBottom(); }, {passive:true});
+  if(window.ResizeObserver){
+    try{ new ResizeObserver(function(){ keep(); }).observe(box); }catch(e){}
+  }
+  // 键盘、切页、旋转都走这条兜底
+  window.addEventListener('resize', function(){
+    setTimeout(keep, 80); setTimeout(keep, 320);
+  });
 })();
 </script>
 </body>
