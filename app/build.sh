@@ -1,37 +1,33 @@
 #!/bin/bash
-# HA star 壳构建脚本
-#
-# 依赖（Ubuntu / aarch64，可从 apt 装）：
-#   apt install aapt apksigner zipalign android-sdk-platform-23
-#   另外需要 JDK 17，以及 r8.jar（放 tools/r8.jar）或 d8
+# HA star 外壳构建脚本
+# 依赖（Ubuntu, aarch64 可从 apt 装）：
+#   apt install aapt dx apksigner zipalign android-sdk-platform-23
 #
 # 用法：
 #   bash build.sh            生成未签名包
-#   bash build.sh sign       顺带签名（先在下面填自己的 keystore）
+#   bash build.sh sign       顺带用 hastar-release.jks 签名
 
 set -e
 
-APP="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(dirname "$APP")"
-OUT="$ROOT/build"
-JAR="${ANDROID_JAR:-/usr/lib/android-sdk/platforms/android-23/android.jar}"
-R8="${R8_JAR:-$ROOT/tools/r8.jar}"
+APP=/sdcard/hastar/app
+OUT=/sdcard/hastar/build
+JAR=/usr/lib/android-sdk/platforms/android-23/android.jar
+KS=/sdcard/hastar/hastar-release.jks
+ALIAS=hastar
+PASS=please-change-me
 
-# ---- 换成你自己的签名 ----
-KS="${HASTAR_KS:-$ROOT/hastar-release.jks}"
-ALIAS="${HASTAR_ALIAS:-hastar}"
-PASS="${HASTAR_PASS:-please-change-me}"
-
-# 网页本体在仓库根目录，构建时拷进 assets
-mkdir -p "$APP/assets"
-cp "$ROOT/ha_star.html" "$APP/assets/ha_star.html"
+# 从网页页脚读版本号，自动写进门牌号，避免每一版都叫同一个号
+VN=$(python3 -c "import re,io;s=io.open('$APP/assets/ha_star.html',encoding='utf-8').read();m=re.search(r'HA star . v([0-9]+)[.]([0-9]+)',s);print('%s.%s'%(m.group(1),m.group(2)) if m else '0.0')")
+VC=$(echo "$VN" | awk -F. '{printf "%d", $1*100+$2}')
+echo "版本 $VN（code $VC）"
 
 rm -rf "$OUT"
-mkdir -p "$OUT/classes" "$OUT/dexout"
+mkdir -p "$OUT/classes"
 
 echo "== 1/5 打包资源与清单"
+python3 "$APP/gen_manifest.py" "$OUT/AndroidManifest.xml" "$VC" "$VN"
 aapt package -f \
-  -M "$APP/AndroidManifest.xml" \
+  -M "$OUT/AndroidManifest.xml" \
   -S "$APP/res" \
   -A "$APP/assets" \
   -I "$JAR" \
@@ -44,12 +40,12 @@ javac -source 8 -target 8 -encoding utf-8 \
   $(find "$APP/src" -name '*.java')
 
 echo "== 3/5 转成 classes.dex"
-java -cp "$R8" com.android.tools.r8.D8 \
+mkdir -p "$OUT/dexout"
+java -cp /sdcard/hastar/tools/r8.jar com.android.tools.r8.D8 \
   --min-api 26 --release \
   --output "$OUT/dexout" \
   $(find "$OUT/classes" -name '*.class')
 cp "$OUT/dexout/classes.dex" "$OUT/classes.dex"
-
 echo "== 4/5 装回 apk"
 cd "$OUT"
 aapt add -f base.apk classes.dex
