@@ -4660,7 +4660,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.6</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.7</div>
     </div>
   </section>
 
@@ -8812,7 +8812,7 @@
             {type:'image_url', image_url:{url:m.src}}
           ]});
         } else {
-          msgs.push({role:m.role, content:'［图片］'});
+          msgs.push({role:m.role, content:'［图片·没开识图，看不到内容，别猜］'});
         }
         return;
       }
@@ -9107,7 +9107,7 @@
         said=true;
         return;
       }
-      if(x.type==='image'){ body='［图片］'; }
+      if(x.type==='image'){ body='［图片·没开识图，看不到内容，别猜］'; }
       if(mine){ msgs.push({role:'assistant',content:body}); }
       else { msgs.push({role:'user',content:who+'：'+body}); }
       said=true;
@@ -14453,7 +14453,7 @@
     fetch(base+'/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({ model:model, max_tokens:24, stream:false, temperature:0.75, top_p:0.9, messages:[{role:'user',content:[
+      body:JSON.stringify({ model:model, max_tokens:300, stream:false, temperature:0.75, top_p:0.9, messages:[{role:'user',content:[
         {type:'text', text:'这张图是什么颜色？两个字的色名就够了。'},
         {type:'image_url', image_url:{url:visionTestImg()}}
       ]}]})
@@ -14476,15 +14476,15 @@
         }
         return;
       }
-      var txt='';
-      try{ var d=JSON.parse(o.t); txt=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||''; }catch(e){}
+      var txt='',rawTxt='';
+      try{ var d=JSON.parse(o.t); var ms=(d.choices&&d.choices[0]&&d.choices[0].message)||{}; rawTxt=o.t; txt=(ms.content||''); if(!String(txt).trim()) txt=(ms.reasoning_content||''); }catch(e){}
       if(/红|red|e02020/i.test(String(txt))){
         setVision(true);
         if(h) h.textContent='通了，这张红图它认出来了。角色现在能看到你发的图片。';
         toast('识图通了');
       } else {
         setVision(false);
-        if(h) h.textContent='能发出去，但它没认出来（回的是：'+(String(txt).slice(0,24)||'空')+'）。角色那边只能收到［图片］两个字。';
+        if(h) h.textContent='能发出去，但它没认出来（回的是：'+(String(txt).slice(0,24)||'空')+'）。角色那边只能收到［图片］两个字。'+(String(txt).trim()?'':'原样返回：'+String(rawTxt||'').slice(0,80));
         toast('像是不会认图');
       }
     }).catch(function(e){
