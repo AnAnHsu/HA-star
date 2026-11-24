@@ -13,7 +13,7 @@
     if(!window.HAAndroid || !HAAndroid.getSafeAreaInsets) return;
     var a = JSON.parse(HAAndroid.getSafeAreaInsets() || '{}');
     var s = document.documentElement.style;
-    if(a.top >= 0) s.setProperty('--ha-inset-top', a.top + 'px');
+    if(a.top > 0) s.setProperty('--ha-inset-top', a.top + 'px');
     if(a.bottom >= 0) s.setProperty('--ha-inset-bottom', a.bottom + 'px');
   }catch(e){}
 })();
@@ -36,7 +36,7 @@
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
     color:var(--txt);background:#e9ecf3;overflow:hidden;
-    display:flex;align-items:center;justify-content:center;
+    display:flex;align-items:flex-start;justify-content:center;
     -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   }
   input,textarea{-webkit-user-select:text;user-select:text;}
@@ -65,6 +65,7 @@
   }
   /* 实际让位规则在本样式表最后（要盖住 .screen 的 inset:0，顺序必须在后面），见「安全区」那一节。 */
   @media (min-width:520px){
+    body{align-items:center;}
     #phone{max-width:430px;max-height:940px;border-radius:40px;
       box-shadow:0 40px 90px rgba(90,100,130,.35),0 0 0 10px #f7f8fb;height:94vh;}
   }
@@ -1866,7 +1867,7 @@
     -webkit-backdrop-filter:var(--bar-bl,blur(24px) saturate(170%));backdrop-filter:var(--bar-bl,blur(24px) saturate(170%));
     box-shadow:var(--bar-sh,0 4px 16px rgba(90,100,130,.08));   /* 跟随「顶部栏和底部栏模式」：隐藏时整条彻底不画 */
   }
-  .chead{position:relative;}
+  .chead{position:relative;flex:none;}
   /* 居中的名字/状态：绝对定位按 padding box 算 50%，顶栏长高后被自身 padding-top 往下拽，
      补回 sat/2 让它在视觉上停在与原来完全相同的高度。 */
   .chead .who{position:absolute;left:50%;top:calc(50% + var(--sat,0px)/2);transform:translate(-50%,-50%);
@@ -1874,7 +1875,7 @@
   .chead .who .nm{font-size:15px;font-weight:600;}
   .chead .who .st{font-size:11px;color:var(--sub);margin-top:2px;}
   #msgs{
-    flex:1;overflow-y:auto;padding:18px 14px 10px;display:flex;flex-direction:column;gap:12px;
+    flex:1;min-height:0;overflow-y:auto;padding:18px 14px 10px;display:flex;flex-direction:column;gap:12px;
     -webkit-overflow-scrolling:touch;
   }
   .row{display:flex;gap:9px;align-items:flex-start;max-width:100%;}
@@ -1959,7 +1960,7 @@
   .typing i:nth-child(2){animation-delay:.18s}.typing i:nth-child(3){animation-delay:.36s}
   @keyframes blink{0%,60%,100%{opacity:.28;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
   .composer{
-    display:flex;gap:9px;align-items:center;padding:10px 12px 16px;
+    flex:none;display:flex;gap:9px;align-items:center;padding:10px 12px 16px;
     background:var(--bar-bg,rgba(255,255,255,.66));border-top:1px solid var(--bar-bd,rgba(255,255,255,.9));
     -webkit-backdrop-filter:var(--bar-bl,blur(24px) saturate(170%));backdrop-filter:var(--bar-bl,blur(24px) saturate(170%));
   }
@@ -2410,6 +2411,12 @@
   #chat{bottom:0;}
   /* 记忆书也铺到最底：底栏自己把安全区吃进 padding-bottom，气泡一直盖到屏幕最下沿 */
   #memory{bottom:0;}
+  /* ---------- 键盘（IME）---------
+     某些机型配着 LAYOUT_HIDE_NAVIGATION 时，系统不会自己缩窗口，键盘直接把底栏盖住。
+     外壳把键盘高度报成 --ha-kb，这里把整屏高度让出来；底部的 --sab 同时归零，
+     那块地方已经被键盘占了，输入栏正好贴在键盘上沿。 */
+  #phone{height:calc(100% - var(--ha-kb,0px));}
+  #phone.kb-on{--sab:0px;}
   /* 底部弹出的面板也要自己让出安全区（手势条 + 键盘） */
   #contacts .sheet-wrap,#addressbook .sheet-wrap,#moments .sheet-wrap,#chat .sheet-wrap{padding-bottom:var(--sab,0px);}
   /* ---------- 我 ---------- *
@@ -4660,7 +4667,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.7</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.10</div>
     </div>
   </section>
 
