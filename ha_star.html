@@ -843,7 +843,9 @@
   .ph3 .fr2.has::after{content:"";position:absolute;inset:0;border-radius:calc(var(--p3-r,14px) - 4px);
     box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.9);}
   /* ============ 第三页：错位叠放的照片卡片 ============ */
-  #pager #grid3{position:relative;}
+  #pager #grid3{position:relative;grid-template-columns:repeat(4,minmax(0,1fr));}
+  #pager #grid3 .slot{min-width:0;}
+  #pager #grid3 .slot>.appicon{max-width:100%;}
   #pager #grid3{-webkit-user-select:none;user-select:none;}
   #pager #grid3 .slot.phgap{display:none;}
   #pager #grid3 .slot.ph3full{
@@ -4665,7 +4667,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.20</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.21</div>
     </div>
   </section>
 
@@ -9402,13 +9404,25 @@
         }
         if(placed[j2]) continue;
       }
-      if(!free.length) break;
-      var f=free.shift();
-      pages[f[0]].children[f[1]].appendChild(icons[j2]);
+      var target=null;
+      while(free.length){
+        var f=free.shift();
+        var cell=pages[f[0]].children[f[1]];
+        if(cell && !cell.firstChild){ target=cell; break; }
+      }
+      if(!target) break;
+      target.appendChild(icons[j2]);
     }
     renderPh();
     renderCard();
     try{ layoutPg3(); }catch(e){}
+    /* 图标全部落位后再量一次第三页中部：decoratePg3 那一次量的时候格子还是空的 */
+    try{ placeChat2(); placeSide(); }catch(e){}
+    try{
+      requestAnimationFrame(function(){
+        try{ placeChat2(); placeSide(); }catch(e){}
+      });
+    }catch(e){}
     try{ if(typeof bindCallIcon==='function') bindCallIcon(); }catch(e){}
     setTimeout(function(){ try{ if(typeof bindCallIcon==='function') bindCallIcon(); }catch(e){} },300);
   }
