@@ -2868,6 +2868,7 @@
           </div>
           <div class="hint" style="margin:8px 0 0">只改联系人列表那张卡片。</div>
         </div>
+
         <div class="cli-sep"></div>
         <div class="cli-sub hide" id="cliTopHead">更改固定按钮样式<i>▾</i></div>
         <div class="cli-subbody hide" id="cliTopBody" style="margin-top:2px">
@@ -3069,6 +3070,21 @@
           <input type="range" id="bubShpOp" min="10" max="100" step="1" value="100" />
           <span id="bubShpOpVal">100%</span>
         </div>
+      </div>
+    </div>
+        <div class="menu-item" id="mSplit" data-fold="sp">一条一句发</div>
+<div class="cm-fold hide" id="fold-sp">
+      <div class="sheet">
+        <div class="hint" style="margin:0 2px 8px">开着时，回复按换行拆成多条，一条一条出来。</div>
+        <div class="seg" id="splitOn">
+          <button data-sp="1" class="on">开</button>
+          <button data-sp="0">关</button>
+        </div>
+        <div class="slider-row" style="margin-top:12px">
+          <input type="range" id="spGap" min="0.2" max="1.2" step="0.1" value="0.5" />
+          <span id="spGapV">0.5s</span>
+        </div>
+        <div class="hint" style="margin:8px 0 0">图片、红包、转账这类整条推的不拆。</div>
       </div>
     </div>
         <div class="menu-item" id="mBubble" data-fold="bub">气泡美化</div>
@@ -4667,7 +4683,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.21</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.25</div>
     </div>
   </section>
 
@@ -7104,6 +7120,7 @@
       ev.stopPropagation();
       var st=cliState(); st.shp=t.getAttribute('data-b'); lsSet(K_CLI,st); applyCliStyle(st);
     };
+
     var th=$('#cliTopHead'), tb=$('#cliTopBody');
     if(th&&tb){
       th.onclick=function(ev){
@@ -8721,6 +8738,51 @@
     lsSet(K_MSG+curId, msgs);
     return msgs;
   }
+  /* ===== 一条一句发：把回复按换行拆成多条气泡逐条推出 ===== */
+  var K_SPLIT='hastar.split.v1';
+  function splitCfg(){
+    var d={on:1,gap:500}, s2=ls(K_SPLIT,{}) || {};
+    if(s2.on!==undefined && s2.on!==null) d.on=(+s2.on)?1:0;
+    if(s2.gap) d.gap=Math.max(200,Math.min(1200,+s2.gap));
+    return d;
+  }
+  function splitParts(txt){
+    var raw=String(txt||'').replace(/\r/g,'').trim();
+    if(!raw) return [];
+    /* 图片、礼物回执这类整条推，不切 */
+    if(/\[\[|【收下】|【退回】/.test(raw)) return [raw];
+    var out=[];
+    raw.split(/\n+/).forEach(function(line){
+      var seg=String(line||'').trim();
+      if(!seg) return;
+      /* 按句号/叹号/问号切，句末标点和紧跟的收尾引号括号一起带走；省略号不断句 */
+      var re=/[^。！？!?]*[。！？!?]+[”"』」’'）)】]*/g;
+      var m, last=0, got=0;
+      while((m=re.exec(seg))!==null){
+        var p=m[0].trim();
+        if(p){ out.push(p); got=1; }
+        last=re.lastIndex;
+      }
+      var rest=seg.slice(last).trim();
+      if(rest) out.push(rest);
+      if(!got && !rest) out.push(seg);
+    });
+    return out.length? out : [raw];
+  }
+  function releaseBubbles(txt, done){
+    var cfg=splitCfg();
+    var parts=cfg.on? splitParts(txt) : (txt?[String(txt)]:[]);
+    if(!parts.length){ if(done) done(); return; }
+    var i=0;
+    function step(){
+      if(i>=parts.length){ if(done) done(); return; }
+      pushMsg('assistant', parts[i++]);
+      renderMsgs();
+      if(i>=parts.length){ if(done) done(); return; }
+      setTimeout(step, cfg.gap);
+    }
+    step();
+  }
 
   function typingRow(on, who){
     var box=$('#msgs');
@@ -8980,9 +9042,10 @@
       typingRow(false);
       var txt=applyReply(reply, curId);
       txt=shopGiftMark(curId, txt);
-      if(txt) pushMsg('assistant', txt);
-      renderMsgs();
-      busy=false; $('#send').disabled=false;
+      releaseBubbles(txt, function(){
+        renderMsgs();
+        busy=false; $('#send').disabled=false;
+      });
     }).catch(function(e){
       typingRow(false);
       busy=false; $('#send').disabled=false;
@@ -9216,9 +9279,10 @@
       typingRow(false);
       var txt=applyReply(reply, curId);
       txt=shopGiftMark(curId, txt);
-      if(txt) pushMsg('assistant', txt);
-      renderMsgs();
-      busy=false; $('#send').disabled=false;
+      releaseBubbles(txt, function(){
+        renderMsgs();
+        busy=false; $('#send').disabled=false;
+      });
     }).catch(function(e){
       typingRow(false);
       busy=false; $('#send').disabled=false;
@@ -14179,6 +14243,32 @@
     }
     $('#mAvShape').onclick=function(){ applyCav(cavState()); fold('av'); };
     $('#mBubShape').onclick=function(){ applyBubShape(bsState()); fold('bs'); };
+    function paintSplitMenu(){
+      var c0=splitCfg();
+      var so=$('#splitOn');
+      if(so) for(var q3=0;q3<so.children.length;q3++){
+        var b3=so.children[q3];
+        if((b3.getAttribute('data-sp')==='1')===!!c0.on) b3.classList.add('on'); else b3.classList.remove('on');
+      }
+      var g0=$('#spGap'); if(g0) g0.value=(c0.gap/1000).toFixed(1);
+      var gv0=$('#spGapV'); if(gv0) gv0.textContent=(c0.gap/1000).toFixed(1)+'s';
+    }
+    $('#mSplit').onclick=function(){ paintSplitMenu(); fold('sp'); };
+    (function(){
+      var so=$('#splitOn');
+      if(so) so.onclick=function(ev){
+        var t=ev.target; if(!t||t.tagName!=='BUTTON') return;
+        ev.stopPropagation();
+        var c0=splitCfg(); c0.on=(t.getAttribute('data-sp')==='1')?1:0;
+        lsSet(K_SPLIT,{on:c0.on,gap:c0.gap}); paintSplitMenu();
+      };
+      var g0=$('#spGap');
+      if(g0) g0.addEventListener('input',function(){
+        var c0=splitCfg(); c0.gap=Math.round(parseFloat(g0.value)*1000);
+        lsSet(K_SPLIT,{on:c0.on,gap:c0.gap});
+        var gv0=$('#spGapV'); if(gv0) gv0.textContent=(c0.gap/1000).toFixed(1)+'s';
+      });
+    })();
     $('#mText').onclick=function(){
       $('#txtOtColor').value=otTxtOf(curId).ot;
       $('#txtMeColor').value=myTxt.me;
@@ -14196,13 +14286,12 @@
     };
     $('#mSys').onclick=function(){
       var c0=findC(curId);
-      if(c0){
-        $('#sysTitle').textContent=(c0.name||'')+'的设定';
-        $('#sysName').value=c0.name||'';
-        $('#sysAge').value=c0.age||'';
-        $('#sysGender').value=c0.gender||'';
-        $('#sysText').value=c0.sys||'';
-      }
+      window.sysCid = c0? c0.id : null;
+      $('#sysTitle').textContent=(c0? (c0.name||'') : '')+'的设定';
+      $('#sysName').value = c0? (c0.name||'') : '';
+      $('#sysAge').value = c0? (c0.age||'') : '';
+      $('#sysGender').value = c0? (c0.gender||'') : '';
+      $('#sysText').value = c0? (c0.sys||'') : '';
       fold('sys');
     };
     ['#sysSave','#sysCancel'].forEach(function(sel){
@@ -14214,11 +14303,16 @@
     $('#mDel').onclick=function(){ closeMenu(); $('#btnChatDel').click(); };
   }
 
+  var sysCid=null;
   var sysBtn=$('#btnChatSys');
   if(sysBtn){
       sysBtn.onclick=function(){
         var c=findC(curId); if(!c) return;
+        window.sysCid=c.id;
         $('#sysTitle').textContent=c.name+'的设定';
+        $('#sysName').value=c.name||'';
+        $('#sysAge').value=c.age||'';
+        $('#sysGender').value=c.gender||'';
         $('#sysText').value=c.sys||'';
         $('#fold-sys').classList.add('on');
       };
@@ -14227,7 +14321,7 @@
         if(e.target===this) this.classList.remove('on');
       });
       $('#sysSave').onclick=function(){
-        var c=findC(curId); if(!c) return;
+        var c=findC(window.sysCid) || findC(curId); if(!c) return;
         var nm=$('#sysName').value.trim();
         if(nm) c.name=nm;
         c.age=$('#sysAge').value.trim();
