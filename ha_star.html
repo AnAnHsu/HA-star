@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, shrink-to-fit=no, interactive-widget=resizes-content" />
 <meta name="theme-color" content="#0b0e1a" />
 <title>HA star</title>
 <!-- 安全区真值：App 外壳（HAAndroid.getSafeAreaInsets）会把系统状态栏/导航栏高度按 CSS px 报过来。
@@ -31,7 +31,8 @@
     --shadow:0 8px 24px rgba(90,100,130,.16);
   }
   html,body{height:100%;margin:0;overscroll-behavior:none;}
-  html{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;}
+  html{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;
+    -webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%;}
   body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
@@ -62,7 +63,7 @@
     --tabbar-h:56px;   /* 底部 tabbar 的统一高度，四个页面共用这一个值 */
   }
   /* 实际让位规则在本样式表最后（要盖住 .screen 的 inset:0，顺序必须在后面），见「安全区」那一节。 */
-  @media (min-width:520px){
+  @media (min-width:600px){
     body{align-items:center;}
     #phone{max-width:430px;max-height:940px;border-radius:40px;
       box-shadow:0 40px 90px rgba(90,100,130,.35),0 0 0 10px #f7f8fb;height:94vh;}
@@ -74,7 +75,7 @@
   }
   /* 手机上：壁纸层固定铺满整个视口，任何父级 padding / 安全区 inset 都截不到它。
      桌面预览（≥520px）保持绝对定位，这样圆角手机框还能把壁纸裁在框里。 */
-  @media (max-width:519px){
+  @media (max-width:599px){
     /* 壁纸层往四周多铺一截：
        ① #phone 带 transform，fixed 的包含块变成 #phone 而不再是视口；
        ② 万一外壳报的视口比屏幕实际矮一点（导航栏那条），
@@ -954,17 +955,17 @@
   .pg3stack .pola .pic.has{color:transparent;}
 
   .icon-grid{
-    display:grid;grid-template-columns:repeat(4,1fr);
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
     gap:22px 12px;align-content:start;align-items:start;
-    flex:0 0 100%;min-width:100%;height:100%;
+    flex:0 0 100%;min-width:0;height:100%;
     padding:0 22px 6px;box-sizing:border-box;
   }
   .icon-grid .slot{
-    min-height:88px;display:flex;align-items:center;justify-content:center;
+    min-width:0;min-height:88px;display:flex;align-items:center;justify-content:center;
   }
   .appicon{
     display:flex;flex-direction:column;align-items:center;gap:8px;
-    cursor:pointer;touch-action:none;transition:transform .12s ease;
+    max-width:100%;min-width:0;cursor:pointer;touch-action:none;transition:transform .12s ease;
   }
   .appicon.dragging-item{
     position:fixed;z-index:900;pointer-events:none;margin:0;
@@ -985,7 +986,8 @@
     transition:transform .16s ease,box-shadow .16s,background-color .18s ease,border-radius .18s ease;
   }
   .appicon:active .tile{transform:scale(.9);box-shadow:0 3px 10px rgba(90,100,130,.2);}
-  .appicon span{font-size:calc(11.5px*var(--ft-sc,1));font-weight:var(--ft-ow,400);text-decoration:var(--ft-dec,none);color:var(--ft,#22242c);opacity:.88;letter-spacing:.4px;}
+  .appicon span{font-size:calc(11.5px*var(--ft-sc,1));font-weight:var(--ft-ow,400);text-decoration:var(--ft-dec,none);color:var(--ft,#22242c);opacity:.88;letter-spacing:.4px;
+    max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   /* 「＋」那个虚线占位块也跟随形状/质感，但它本来就更淡（.35），所以单独给一个底色变量 */
   .appicon.add .tile{
     background-color:var(--di-bg-add,rgba(255,255,255,.35));
@@ -4683,7 +4685,7 @@
         if(b) b.onclick=function(){ location.href='https://github.com/AnAnHsu/HA-star'; };
       })();
       </script>
-<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.25</div>
+<div class="hint" style="text-align:center;padding:6px 0 24px;">HA star · v47.26</div>
     </div>
   </section>
 
